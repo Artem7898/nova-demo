@@ -1,5 +1,8 @@
 # Nova Demo on Railway Free
 
+For all services and all 19 scenarios, use the
+[Railway Hobby guide with a $15 budget](railway-hobby.md).
+
 This deployment runs one Django service with SQLite on a persistent volume.
 It includes both interface languages and the FastAPI/GraphQL demo dependencies.
 Redis and Memcached are not provisioned: their three scenarios explicitly report
@@ -83,9 +86,9 @@ python manage.py clearsessions
 ```
 
 The first command intentionally deletes demo workspaces older than seven days.
-Take a database/media backup before cleanup or schema changes. Uploaded media is
-preserved on the volume, but public uploaded-media delivery is not configured in
-this profile; the demo catalog's bundled SVG images are served by WhiteNoise.
+Take a database/media backup before cleanup or schema changes. Uploaded images
+are preserved on the volume and served only to their visitor workspace or staff;
+the demo catalog's bundled SVG images are served publicly by WhiteNoise.
 
 ## Local production smoke test
 

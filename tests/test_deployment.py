@@ -36,7 +36,7 @@ def production_env(tmp_path):
     env = {
         key: value
         for key, value in os.environ.items()
-        if not key.startswith(("DJANGO_", "NOVA_DEMO_", "RAILWAY_"))
+        if not key.startswith(("DJANGO_", "NOVA_DEMO_", "RAILWAY_", "PG"))
     }
     env.update(
         DJANGO_SETTINGS_MODULE="config.railway_settings",
@@ -49,7 +49,9 @@ def production_env(tmp_path):
     return env
 
 
-@pytest.mark.parametrize("fault", ["secret", "volume", "relative_path", "postgres"])
+@pytest.mark.parametrize(
+    "fault", ["secret", "volume", "relative_path", "postgres", "database_kind", "remote_services"]
+)
 def test_production_rejects_unsafe_startup(tmp_path, fault):
     env = production_env(tmp_path)
     if fault == "secret":
@@ -58,6 +60,18 @@ def test_production_rejects_unsafe_startup(tmp_path, fault):
         env["RAILWAY_ENVIRONMENT_ID"] = "test-railway-environment"
     elif fault == "relative_path":
         env["NOVA_DEMO_DATA_DIR"] = "data"
+    elif fault == "database_kind":
+        env["NOVA_DEMO_DB"] = "unknown"
+    elif fault == "remote_services":
+        env.update(
+            NOVA_DEMO_DB="postgres",
+            NOVA_DEMO_REQUIRE_SERVICES="1",
+            PGDATABASE="demo",
+            PGUSER="demo",
+            PGPASSWORD="test",
+            PGHOST="db",
+            PGPORT="5432",
+        )
     else:
         env["NOVA_DEMO_DB"] = "postgres"
     result = subprocess.run(
@@ -65,6 +79,38 @@ def test_production_rejects_unsafe_startup(tmp_path, fault):
     )
     assert result.returncode != 0
     assert not (tmp_path / "data" / "demo.sqlite3").exists()
+
+
+def test_postgres_profile_uses_configured_service_without_sqlite_fallback(tmp_path):
+    env = production_env(tmp_path)
+    env.update(
+        NOVA_DEMO_DB="postgres",
+        NOVA_DEMO_REQUIRE_SERVICES="1",
+        PGDATABASE="railway",
+        PGUSER="postgres",
+        PGPASSWORD="test-not-a-secret",
+        PGHOST="postgres.railway.internal",
+        PGPORT="5432",
+        NOVA_DEMO_REDIS_URL="redis://redis.railway.internal:6379/0",
+        NOVA_DEMO_MEMCACHED_SERVER="memcached.railway.internal:11211",
+    )
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "from django.conf import settings; "
+            "assert settings.DATABASES['default']['ENGINE'] == 'django.db.backends.postgresql'; "
+            "assert settings.DATABASES['default']['HOST'] == 'postgres.railway.internal'; "
+            "assert settings.DATABASES['default']['NAME'] == 'railway'; "
+            "assert settings.DATABASES['default']['CONN_MAX_AGE'] == 0",
+        ],
+        cwd=ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=10,
+    )
+    assert result.returncode == 0, result.stderr
 
 
 def test_production_launcher_http_and_database_survive_restart(tmp_path):

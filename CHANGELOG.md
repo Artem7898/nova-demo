@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Extend the Railway profile to PostgreSQL with required connection variables and
+  an optional full-demo check that requires Redis/Memcached configuration.
+- Add a production-container CI job exercising all 19 scenarios through HTTP on
+  PostgreSQL, Redis and Memcached, including HTTPS proxy handling and CSRF.
+- Serve uploaded product images only to the owning visitor workspace or staff;
+  protect media in development and production with the same access checks.
+- Document the full Railway Hobby deployment and a $15 monthly spending limit,
+  with a $10 alert, private service connections and billing limitations.
+
 - Railway Free deployment profile: a Docker image with locked runtime dependencies,
   one synchronous Gunicorn worker, automatic PORT binding and SQLite on a volume.
 - Production-only HTTPS/proxy settings, secure cookies, explicit allowed hosts and

@@ -66,3 +66,37 @@ jobs:
           docker logs nova-demo-deploy || true
           docker rm -f nova-demo-deploy || true
           docker volume rm nova-demo-deploy || true
+  deployment-postgres:
+    name: Railway full stack
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start PostgreSQL, Redis and Memcached
+        run: docker compose up -d --wait
+      - name: Build production image
+        run: docker build -t nova-demo:railway-full .
+      - name: Start full demo with persistent media
+        run: |
+          docker volume create nova-demo-media
+          docker run -d --name nova-demo-full --network host \
+            -v nova-demo-media:/data \
+            -e RAILWAY_ENVIRONMENT_ID=ci \
+            -e RAILWAY_VOLUME_MOUNT_PATH=/data \
+            -e RAILWAY_PUBLIC_DOMAIN=demo.example \
+            -e DJANGO_SECRET_KEY=ci-only-not-a-production-secret-railway-full-demo \
+            -e NOVA_DEMO_DB=postgres -e NOVA_DEMO_REQUIRE_SERVICES=1 \
+            -e PGHOST=127.0.0.1 -e PGPORT=5433 \
+            -e PGDATABASE=nova_demo -e PGUSER=nova -e PGPASSWORD=nova \
+            -e NOVA_DEMO_REDIS_URL=redis://127.0.0.1:56379/0 \
+            -e NOVA_DEMO_MEMCACHED_SERVER=127.0.0.1:51211 \
+            -e PORT=58000 nova-demo:railway-full
+      - name: Check all 19 scenarios through HTTPS proxy simulation
+        run: python deploy/check_http.py http://127.0.0.1:58000 --require-services
+      - if: always()
+        name: Container logs and cleanup
+        run: |
+          docker logs nova-demo-full || true
+          docker rm -f nova-demo-full || true
+          docker volume rm nova-demo-media || true
+          docker compose down
