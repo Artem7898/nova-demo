@@ -1,0 +1,54 @@
+{% load static i18n %}{% get_current_language as LANGUAGE_CODE %}
+<!doctype html><html lang="{{ LANGUAGE_CODE }}"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Nova Demo · Interactive playground{% endblock %}</title>
+<meta name="description" content="{% translate 'Проверьте Django Nova в действии: модели, валидация, кэш, async, DRF и наблюдаемость.' %}">
+<link rel="icon" href="{% static 'demo/favicon.svg' %}" type="image/svg+xml">
+<link rel="stylesheet" href="{% static 'demo/app.css' %}">
+<script src="{% url 'javascript-catalog' %}" defer></script>
+<script src="{% static 'demo/app.js' %}" defer></script>
+</head><body data-page="{{ page }}">
+<svg class="svg-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
+<symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><path d="m8 5-6 7 6 7m8-14 6 7-6 7m-3-16-2 20"/></symbol>
+<symbol id="i-box" viewBox="0 0 24 24"><path d="m12 2 9 5v10l-9 5-9-5V7l9-5Zm0 10 9-5M3 7l9 5v10M7 4.8l9 5.2"/></symbol>
+<symbol id="i-plug" viewBox="0 0 24 24"><path d="M8 2v6m8-6v6M5 8h14v3a7 7 0 0 1-7 7v4M5 8v3a7 7 0 0 0 7 7"/></symbol>
+<symbol id="i-book" viewBox="0 0 24 24"><path d="M12 5v16M3 3c4-1 6 0 9 2 3-2 5-3 9-2v16c-4-1-6 0-9 2-3-2-5-3-9-2Z"/></symbol>
+<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+<symbol id="i-external" viewBox="0 0 24 24"><path d="M14 3h7v7M21 3 10 14m-1-9H4a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="m8 4 12 8-12 8Z"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/></symbol>
+<symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 4 16 4 16 0V5M4 12c0 4 16 4 16 0"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="m12 2 9 4v6c0 6-9 10-9 10S3 18 3 12V6l9-4Z"/><path d="m8 11 3 3 5-5"/></symbol>
+<symbol id="i-bolt" viewBox="0 0 24 24"><path d="m13 2-9 12h7l-1 8 10-13h-7Z"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V3H3v13h5"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 7V2m0 5h-5M4 17v5m0-5h5M5 7a8 8 0 0 1 15 0M4 17a8 8 0 0 0 15 0"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+<symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></symbol>
+</defs></svg>
+<a class="skip-link" href="#main">{% translate 'К содержимому' %}</a>
+<aside class="sidebar" id="sidebar">
+<a href="/" class="brand"><span class="brand-mark">n<span>✳</span></span><span>nova<span class="brand-demo"> / demo</span></span></a>
+<div class="workspace-label"><span class="tiny-dot"></span> DEVELOPER PLAYGROUND</div>
+<div class="nav-label">{% translate 'РАБОЧЕЕ ПРОСТРАНСТВО' %}</div>
+<nav aria-label="{% translate 'Основная навигация' %}">
+<a href="/" class="nav-item {% if page == 'lab' %}active{% endif %}" {% if page == 'lab' %}aria-current="page"{% endif %}><svg><use href="#i-grid"/></svg>{% translate 'Лаборатория' %}<span class="nav-count">{{ scenario_count }}</span></a>
+<a href="/catalog/" class="nav-item {% if page == 'catalog' %}active{% endif %}" {% if page == 'catalog' %}aria-current="page"{% endif %}><svg><use href="#i-box"/></svg>{% translate 'Демо-каталог' %}</a>
+<a href="/schemas/" class="nav-item {% if page == 'schemas' %}active{% endif %}" {% if page == 'schemas' %}aria-current="page"{% endif %}><svg><use href="#i-code"/></svg>{% translate 'Схемы и контракты' %}</a>
+<a href="/integrations/" class="nav-item {% if page == 'integrations' %}active{% endif %}" {% if page == 'integrations' %}aria-current="page"{% endif %}><svg><use href="#i-plug"/></svg>{% translate 'Интеграции' %}</a>
+</nav>
+<div class="nav-label secondary-label">{% translate 'РЕСУРСЫ' %}</div>
+<nav aria-label="{% translate 'Ресурсы' %}"><a href="/api/docs/" class="nav-item"><svg><use href="#i-book"/></svg>API Explorer<svg class="external"><use href="#i-external"/></svg></a>
+<a href="/admin/" class="nav-item"><svg><use href="#i-shield"/></svg>Django Admin<svg class="external"><use href="#i-external"/></svg></a>
+<a href="https://github.com/Artem7898/django-nova" target="_blank" rel="noopener" class="nav-item"><svg><use href="#i-code"/></svg>{% translate 'Исходный код' %}<svg class="external"><use href="#i-external"/></svg></a></nav>
+<div class="sidebar-bottom"><div class="build-card"><span class="version-dot"></span><strong>Django Nova {{ nova_version }}</strong><span class="beta-badge">BETA</span><p>Production-oriented.<br>{% translate 'Проверяемое поведение.' %}</p></div><div class="maintainer"><div class="avatar">A</div><div><strong>Artem7898</strong><small>{% translate 'Автор Django Nova' %}</small></div></div></div>
+</aside>
+<div class="app-shell"><header class="topbar"><div class="breadcrumbs"><button class="icon-button mobile-menu" aria-label="{% translate 'Открыть меню' %}" aria-expanded="false"><svg><use href="#i-menu"/></svg></button><span>Workspace</span><span class="crumb-slash">/</span><strong>{% if page == 'catalog' %}{% translate 'Демо-каталог' %}{% elif page == 'schemas' %}{% translate 'Схемы и контракты' %}{% elif page == 'integrations' %}{% translate 'Интеграции' %}{% else %}{% translate 'Лаборатория' %}{% endif %}</strong></div><div class="topbar-right"><form class="language-switcher" action="{% url 'set_language' %}" method="post" aria-label="{% translate 'Язык интерфейса' %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button type="submit" name="language" value="ru" lang="ru" aria-label="Русский" aria-pressed="{% if LANGUAGE_CODE == 'ru' %}true{% else %}false{% endif %}" class="{% if LANGUAGE_CODE == 'ru' %}active{% endif %}">RU</button><button type="submit" name="language" value="en" lang="en" aria-label="English" aria-pressed="{% if LANGUAGE_CODE == 'en' %}true{% else %}false{% endif %}" class="{% if LANGUAGE_CODE == 'en' %}active{% endif %}">EN</button></form><span class="environment"><span class="tiny-dot"></span> {{ database_vendor }} environment</span><a href="/api/docs/" class="top-link">API docs <svg><use href="#i-external"/></svg></a></div></header>
+<main id="main">{% block content %}{% endblock %}</main>
+<footer><span>Nova Demo <span class="footer-dot">·</span> Django {{ django_version }}</span><span>{% translate 'Реальный код. Наблюдаемые результаты.' %}</span></footer></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+{% csrf_token %}
+{% block scripts %}{% endblock %}
+</body></html>

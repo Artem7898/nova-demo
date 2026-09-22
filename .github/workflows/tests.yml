@@ -1,0 +1,40 @@
+name: Demo checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        database: [sqlite, postgres]
+    env:
+      UV_PYTHON: "3.12"
+      NOVA_DEMO_DB: ${{ matrix.database }}
+      PGPORT: "5433"
+      NOVA_DEMO_REDIS_URL: redis://127.0.0.1:56379/0
+      NOVA_DEMO_MEMCACHED_SERVER: 127.0.0.1:51211
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --locked --all-extras --dev
+      - run: docker compose up -d --wait
+      - run: uv run --locked ruff check .
+      - run: uv run --locked ruff format --check .
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm test
+      - run: uv run --locked pyright catalog config
+      - run: node --check static/demo/app.js
+      - run: uv run --locked manage.py check
+      - run: uv run --locked manage.py makemigrations --check --dry-run
+      - run: uv run --locked manage.py migrate --noinput
+      - run: uv run --locked manage.py collectstatic --noinput
+      - run: uv run --locked manage.py spectacular --validate --file /tmp/nova-demo-api.yaml
+      - run: uv run --locked pytest -q -rs -W error::pytest.PytestWarning
+      - run: uv run --locked manage.py nova_smoke --require-services
+      - if: always()
+        run: docker compose down

@@ -1,0 +1,7 @@
+{
+  "name": "nova-demo-ui-checks",
+  "private": true,
+  "scripts": {"test": "node --test tests/ui_smoke.mjs"},
+  "devDependencies": {"jsdom": "26.1.0"},
+  "engines": {"node": ">=20"}
+}

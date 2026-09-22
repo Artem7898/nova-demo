@@ -1,0 +1,186 @@
+# English translations for Nova Demo. Source language: Russian.
+
+msgid ""
+msgstr ""
+"Project-Id-Version: Nova Demo 0.2.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-22 00:02+0000\n"
+"PO-Revision-Date: 2026-09-22 00:00+0000\n"
+"Last-Translator: Nova Demo maintainers\n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+#: static/demo/app.js:16
+msgid "HTTP {status}: сервер вернул неожиданный ответ."
+msgstr "HTTP {status}: the server returned an unexpected response."
+
+#: static/demo/app.js:20
+msgid "Скопировано"
+msgstr "Copied"
+
+#: static/demo/app.js:20
+msgid "Браузер не разрешил копирование. Выделите текст вручную."
+msgstr "The browser blocked copying. Select the text manually."
+
+#: static/demo/app.js:26
+msgid "Нет ответа"
+msgstr "No response"
+
+#: static/demo/app.js:30
+msgid "подключены"
+msgstr "connected"
+
+#: static/demo/app.js:30
+msgid "не подключены"
+msgstr "not connected"
+
+#: static/demo/app.js:32
+msgid "Подключено"
+msgstr "Connected"
+
+#: static/demo/app.js:32
+msgid "Не настроено"
+msgstr "Not configured"
+
+#: static/demo/app.js:32
+msgid "Недоступно"
+msgstr "Unavailable"
+
+#: static/demo/app.js:33
+msgid "В пределах процесса"
+msgstr "Within this process"
+
+#: static/demo/app.js:33
+msgid "Основная база демо"
+msgstr "Demo database"
+
+#: static/demo/app.js:33
+msgid "Реальная интеграционная проверка"
+msgstr "Real integration check"
+
+#: static/demo/app.js:42
+msgid "Пройдено"
+msgstr "Passed"
+
+#: static/demo/app.js:42
+msgid "Ошибка"
+msgstr "Failed"
+
+#: static/demo/app.js:42
+msgid "Не выполнено"
+msgstr "Skipped"
+
+#: static/demo/app.js:42 static/demo/app.js:86
+msgid "Выполняется"
+msgstr "Running"
+
+#: static/demo/app.js:48
+msgid " · Эксперимент"
+msgstr " · Experimental"
+
+#: static/demo/app.js:48
+msgid " · Нужен сервис"
+msgstr " · Service required"
+
+#: static/demo/app.js:48
+msgid "Сценарии не найдены. Попробуйте другой запрос."
+msgstr "No scenarios found. Try a different search."
+
+#: static/demo/app.js:58
+msgid "Редактируйте JSON. Произвольный Python-код не принимается."
+msgstr "Edit the JSON. Arbitrary Python code is not accepted."
+
+#: static/demo/app.js:58
+msgid "У сценария фиксированные входные данные для воспроизводимой проверки."
+msgstr "This scenario uses fixed inputs for a reproducible check."
+
+#: static/demo/app.js:64
+msgid "Не запущен"
+msgstr "Not run"
+
+#: static/demo/app.js:67
+msgid "// Запустите сценарий, чтобы получить ответ."
+msgstr "// Run a scenario to see its response."
+
+#: static/demo/app.js:68
+msgid "Всё готово к первому запуску"
+msgstr "Ready for your first run"
+
+#: static/demo/app.js:68
+msgid "Здесь появятся проверки, SQL-счётчики"
+msgstr "Checks and SQL counts will appear here,"
+
+#: static/demo/app.js:68
+msgid "и фактический ответ Django Nova."
+msgstr "along with the actual Django Nova response."
+
+#: static/demo/app.js:70
+msgid "Время запуска"
+msgstr "Run time"
+
+#: static/demo/app.js:70
+msgid "SQL в шагах"
+msgstr "SQL in steps"
+
+#: static/demo/app.js:70
+msgid "Проверки"
+msgstr "Checks"
+
+#: static/demo/app.js:74
+msgid "ACCEPTED · Модель прошла валидацию"
+msgstr "ACCEPTED · The model passed validation"
+
+#: static/demo/app.js:74
+msgid "REJECTED · Невалидная запись заблокирована"
+msgstr "REJECTED · The invalid record was blocked"
+
+#: static/demo/app.js:76
+msgid "Preview / эксперимент. Подробные границы — во вкладке JSON."
+msgstr "Preview / experimental. See the JSON tab for the exact scope."
+
+#: static/demo/app.js:81
+msgid "сценариев пройдено"
+msgstr "scenarios passed"
+
+#: static/demo/app.js:84
+msgid "Выполняется…"
+msgstr "Running…"
+
+#: static/demo/app.js:84
+msgid "Запустить сценарий"
+msgstr "Run scenario"
+
+#: static/demo/app.js:89
+msgid "Сервер не ответил за 45 секунд. Запуск мог продолжиться; проверьте журнал."
+msgstr "The server did not respond within 45 seconds. The run may still be active; check the log."
+
+#: static/demo/app.js:92
+msgid "Введите корректный JSON-объект."
+msgstr "Enter a valid JSON object."
+
+#: static/demo/app.js:94
+msgid "Проверка {current} / {total}"
+msgstr "Check {current} / {total}"
+
+#: static/demo/app.js:94
+msgid "Запустить все проверки"
+msgstr "Run all checks"
+
+#: static/demo/app.js:94
+msgid "Результаты запусков доступны ниже и в JSON."
+msgstr "Run results are available below and in JSON."
+
+#: static/demo/app.js:107
+msgid "Изменить товар"
+msgstr "Edit product"
+
+#: static/demo/app.js:107
+msgid "Новый товар"
+msgstr "New product"
+
+#: static/demo/app.js:111
+msgid "Удалить этот товар из вашей песочницы?"
+msgstr "Delete this product from your sandbox?"
