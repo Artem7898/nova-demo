@@ -1,0 +1,15 @@
+.git
+.idea
+.venv
+.env*
+**/__pycache__
+**/*.pyc
+**/*.sqlite3*
+node_modules
+staticfiles
+media
+tests
+.pytest_cache
+.ruff_cache
+.coverage*
+*.log

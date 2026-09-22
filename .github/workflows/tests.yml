@@ -38,3 +38,31 @@ jobs:
       - run: uv run --locked manage.py nova_smoke --require-services
       - if: always()
         run: docker compose down
+  deployment:
+    name: Railway container
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build production image
+        run: docker build -t nova-demo:railway .
+      - name: Start with a persistent volume
+        run: |
+          docker volume create nova-demo-deploy
+          docker run -d --name nova-demo-deploy -p 127.0.0.1:58000:8000 \
+            -v nova-demo-deploy:/data \
+            -e RAILWAY_ENVIRONMENT_ID=ci \
+            -e RAILWAY_VOLUME_MOUNT_PATH=/data \
+            -e RAILWAY_PUBLIC_DOMAIN=demo.example \
+            -e DJANGO_SECRET_KEY=ci-only-not-a-production-secret-railway-deployment-test \
+            -e PORT=8000 nova-demo:railway
+      - name: Check production HTTP and languages
+        run: python deploy/check_http.py http://127.0.0.1:58000
+      - name: Run demo scenarios without optional services
+        run: docker exec nova-demo-deploy python manage.py nova_smoke
+      - if: always()
+        name: Container logs and cleanup
+        run: |
+          docker logs nova-demo-deploy || true
+          docker rm -f nova-demo-deploy || true
+          docker volume rm nova-demo-deploy || true

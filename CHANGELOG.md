@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Railway Free deployment profile: a Docker image with locked runtime dependencies,
+  one synchronous Gunicorn worker, automatic PORT binding and SQLite on a volume.
+- Production-only HTTPS/proxy settings, secure cookies, explicit allowed hosts and
+  startup checks for a private secret and persistent storage.
+- Lightweight database readiness endpoint `/healthz/` and startup migrations after
+  volume mounting. Tests cover real HTTP, RU/EN and database survival after restart.
+- Railway setup and usage-limit documentation; CI builds and checks the Docker image.
+
 ## 0.2.1 — 2026-09-22
 
 - RU/EN switch in the upper panel: native Django i18n, CSRF protection,
