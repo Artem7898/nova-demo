@@ -9,9 +9,13 @@ adaptive grid, keyboard navigation, JSON editor, error presets,
 SQL counters and export of startup results. The catalog images are local SVG.
 Fonts are downloaded from Google Fonts; if there is no network, the system font is used.
 
-## Hosting on Railway Free
+## Hosting on Railway
 
-Follow the [Railway deployment guide](docs/railway.md) for the Docker image,
+For all 19 demo scenarios, use [Railway Hobby with PostgreSQL, Redis and Memcached](docs/railway-hobby.md).
+The guide targets a budget up to $15/month and documents usage alerts and the
+workspace hard limit. The final cost depends on actual consumption.
+
+For a minimal starter, follow the [Railway Free deployment guide](docs/railway.md) for the Docker image,
 persistent SQLite volume, HTTPS, healthcheck and RU/EN verification. The single-service
 profile leaves the three Redis/Memcached scenarios explicitly skipped. Railway's
 free usage allowance is limited; enable Serverless and check account usage.

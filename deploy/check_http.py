@@ -9,21 +9,28 @@ from http.cookies import SimpleCookie
 from urllib.parse import urlencode, urlsplit
 
 
-def check(base_url: str) -> None:
+def check(base_url: str, *, require_services: bool = False) -> None:
     target = urlsplit(base_url)
     cookies: dict[str, str] = {}
 
-    def request(path, method="GET", data=None, *, secure=True, host="demo.example"):
+    def request(
+        path, method="GET", data=None, *, secure=True, host="demo.example", json_body=False
+    ):
         connection = http.client.HTTPConnection(target.hostname, target.port, timeout=10)
         headers = {"Host": host, "Cookie": "; ".join(f"{k}={v}" for k, v in cookies.items())}
         if secure:
             headers["X-Forwarded-Proto"] = "https"
         if data is not None:
-            headers.update({"Content-Type": "application/x-www-form-urlencoded"})
+            headers["Content-Type"] = (
+                "application/json" if json_body else "application/x-www-form-urlencoded"
+            )
             headers["X-CSRFToken"] = cookies["csrftoken"]
             headers["Origin"] = f"https://{host}"
         try:
-            connection.request(method, path, urlencode(data) if data else None, headers)
+            body = (
+                (json.dumps(data) if json_body else urlencode(data)) if data is not None else None
+            )
+            connection.request(method, path, body, headers)
             response = connection.getresponse()
             body = response.read()
             for name, value in response.getheaders():
@@ -69,7 +76,26 @@ def check(base_url: str) -> None:
     assert status == 200 and json.loads(body)["count"] == 8
     assert request("/", host="untrusted.example")[0] == 400
     print("OK readiness, HTTPS, static CSS, secure cookies, RU/EN, catalog and host validation")
+    if require_services:
+        status, _, body = request("/lab/api/health/")
+        health = json.loads(body)
+        assert status == 200
+        assert health["services"]["database"]["label"] == "postgresql"
+        assert all(item["status"] == "ready" for item in health["services"].values())
+        catalog = re.search(
+            rb'<script id="scenario-data" type="application/json">(.*?)</script>', html, re.S
+        )
+        assert catalog, "Missing scenario catalog"
+        scenarios = json.loads(catalog[1])
+        assert len(scenarios) == 19
+        for scenario in scenarios:
+            status, _, body = request(
+                f"/lab/api/run/{scenario['id']}/", "POST", scenario["payload"], json_body=True
+            )
+            result = json.loads(body)
+            assert status == 200 and result["status"] == "passed", (scenario, result)
+        print(f"OK {len(scenarios)}/{len(scenarios)} scenarios via production HTTP")
 
 
 if __name__ == "__main__":
-    check(sys.argv[1])
+    check(sys.argv[1], require_services="--require-services" in sys.argv[2:])
