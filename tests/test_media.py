@@ -26,8 +26,8 @@ def test_uploaded_images_respect_workspace_and_staff(visitor, admin_client, gall
         assert response["Content-Type"] == "image/png"
         assert "no-store" in response["Cache-Control"]
         assert response["X-Content-Type-Options"] == "nosniff"
+        # Django's test client closes a consumed streaming response itself.
         assert b"".join(response.streaming_content) == output.getvalue()
-        response.close()
     other = Client()
     assert other.get(field.url).status_code == 404
     assert other.get("/").status_code == 200
