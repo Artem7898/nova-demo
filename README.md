@@ -9,6 +9,13 @@ adaptive grid, keyboard navigation, JSON editor, error presets,
 SQL counters and export of startup results. The catalog images are local SVG.
 Fonts are downloaded from Google Fonts; if there is no network, the system font is used.
 
+## Hosting on Railway Free
+
+Follow the [Railway deployment guide](docs/railway.md) for the Docker image,
+persistent SQLite volume, HTTPS, healthcheck and RU/EN verification. The single-service
+profile leaves the three Redis/Memcached scenarios explicitly skipped. Railway's
+free usage allowance is limited; enable Serverless and check account usage.
+
 ## Quick Launch: SQLite
 
 We need Python 3.12 and uv. Unzip the archive into a separate folder:
@@ -25,7 +32,7 @@ Open **http://127.0.0.1:8000 /**. The first entry creates your sandbox:
 its own records; the administrative part remains accessible only to staff.
 
 Click "Run all checks". Without Redis/Memcached, three scripts will receive the status
-"Failed" with connection instructions. FastAPI and GraphQL are installed via
+"Skipped" with connection instructions. FastAPI and GraphQL are installed via
 `--all-extras`; without extras, their scripts are also explicitly skipped.
 
 Open "Demo" catalog → "Create product" for CRUD. A negative price will give an error
