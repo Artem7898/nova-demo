@@ -3,22 +3,13 @@
 Interactive Django application for checking **published django-nova 0.6.3**.
 Demo version — **0.2.1**. This is a separate project, not an update of the Nova package sources.
 
+Live demo: **[https://novademo.tech](https://novademo.tech)** — hosted on a [Hostinger VPS](https://www.hostinger.com/).
+
 The lab contains 19 executable scripts, a CRUD catalog, a schema inspector,
 connection statuses, a Swagger UI, and a closed Django Admin. Interface in Russian and English (RU / EN),
 adaptive grid, keyboard navigation, JSON editor, error presets,
 SQL counters and export of startup results. The catalog images are local SVG.
 Fonts are downloaded from Google Fonts; if there is no network, the system font is used.
-
-## Hosting on Railway
-
-For all 19 demo scenarios, use [Railway Hobby with PostgreSQL, Redis and Memcached](docs/railway-hobby.md).
-The guide targets a budget up to $15/month and documents usage alerts and the
-workspace hard limit. The final cost depends on actual consumption.
-
-For a minimal starter, follow the [Railway Free deployment guide](docs/railway.md) for the Docker image,
-persistent SQLite volume, HTTPS, healthcheck and RU/EN verification. The single-service
-profile leaves the three Redis/Memcached scenarios explicitly skipped. Railway's
-free usage allowance is limited; enable Serverless and check account usage.
 
 ## Quick Launch: SQLite
 
@@ -143,16 +134,89 @@ For the old SQLite, you can copy **a backup copy** of `db.sqlite3` under the nam
 `demo.sqlite3` to a new folder and perform migrate. Do not replace an already filled one
 `demo.sqlite3` without a separate decision on data migration.
 
-## Public demonstration
+## Public deployment on Hostinger VPS
 
-Before publishing, set up a separate database, HTTPS, `DJANGO_DEBUG=0`, your own
-`DJANGO_SECRET_KEY', `DJANGO_ALLOWED_HOSTS` and `DJANGO_CSRF_TRUSTED_ORIGINS'.
-The application does not contain a user login to Admin: create an administrator
-via `uv run --locked manage.py createsuperuser`. Do not publish his password.
+The public demo is hosted on a [Hostinger VPS](https://www.hostinger.com/):
+**[https://novademo.tech](https://novademo.tech)**.
+The `www` address is also available at **https://www.novademo.tech**.
+
+The deployment uses Ubuntu, Docker Compose, PostgreSQL 16, Redis 7,
+Memcached 1.6, and Nginx with a Let's Encrypt certificate managed by Certbot.
+The application container publishes only `127.0.0.1:8000`; Nginx handles
+public HTTP/HTTPS traffic. PostgreSQL, Redis, and Memcached are accessible
+inside the Compose network, without public host ports.
+
+The deployed VPS uses this layout:
+
+| Path | Purpose |
+| --- | --- |
+| `/opt/nova-demo` | Application repository and Docker build context |
+| `/etc/nova-demo/compose.yaml` | VPS deployment configuration |
+| `/etc/nova-demo/app.env` | Private Django secret key and PostgreSQL password; root-only access |
+| `/var/lib/nova-demo/data` | Persistent application data; mounted as `/data` inside `web` |
+| `/var/lib/nova-demo/data/media` | Uploaded files |
+| `/etc/nginx/sites-available/novademo.tech` | Nginx configuration for the domain |
+| `/usr/local/bin/nova-compose` | Server helper for the VPS Compose configuration |
+
+`nova-compose` is a helper installed on the VPS, equivalent to:
 
 ```bash
-uv run --locked manage.py collectstatic --noinput
-uv run --locked gunicorn config.wsgi:application --bind 127.0.0.1:8000 --workers 1 --threads 1 --timeout 60
+docker compose --env-file /etc/nova-demo/app.env \
+  -f /etc/nova-demo/compose.yaml "$@"
+```
+
+The repository's Compose file and localhost ports described above remain
+the configuration for local development. PostgreSQL data on the VPS is stored
+in the deployment's `pgdata` volume. Back up both PostgreSQL and the persistent
+application data before updating the deployment.
+
+The Docker image uses Python 3.12. Its existing `deploy/start.sh` runs migrations
+and starts Gunicorn with one worker and one thread. Static files are collected
+during the image build and served by WhiteNoise. Uploaded files are served
+through Django's access-controlled view.
+
+The existing `config.railway_settings` module is also used on this VPS;
+its name does not require hosting on Railway. The deployment sets
+`NOVA_DEMO_DATA_DIR=/data`, `NOVA_DEMO_DB=postgres`,
+`NOVA_DEMO_REQUIRE_SERVICES=1`, and `NOVA_DEMO_ALLOW_RUNS=1`, together with
+the PostgreSQL and cache connection variables.
+
+Before publishing, set up a separate database, HTTPS, `DJANGO_DEBUG=0`, your own
+`DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_HOSTS` and `DJANGO_CSRF_TRUSTED_ORIGINS`.
+For this domain, the VPS Compose configuration passes:
+
+```dotenv
+DJANGO_DEBUG=0
+DJANGO_ALLOWED_HOSTS=novademo.tech,www.novademo.tech,127.0.0.1,localhost
+DJANGO_CSRF_TRUSTED_ORIGINS=https://novademo.tech,https://www.novademo.tech
+```
+
+Run these commands as root on the configured VPS to build/start the deployment
+and check its health:
+
+```bash
+nova-compose up -d --build --wait --wait-timeout 180
+nova-compose ps
+nova-compose logs --tail=80 web db redis memcached
+curl --fail --silent --show-error https://novademo.tech/healthz/
+nova-compose exec web python manage.py nova_smoke --require-services
+```
+
+The health endpoint should return `{"status": "ok"}`.
+The application does not contain a user login to Admin: create an administrator
+on the VPS with:
+
+```bash
+nova-compose exec web python manage.py createsuperuser
+```
+
+Do not publish the administrator password or `/etc/nova-demo/app.env`.
+HTTPS is configured for both domain names with HTTP-to-HTTPS redirects.
+Certbot renews the certificate automatically. Check renewal with:
+
+```bash
+systemctl list-timers certbot.timer --no-pager
+certbot renew --dry-run
 ```
 
 Set up a reverse proxy with HTTPS and a shared rate limit. Built-in demo restrictions
@@ -166,9 +230,9 @@ Use PostgreSQL for concurrent users.
 Sessions last 24 hours; delete outdated sandboxes on a schedule:
 
 ```bash
-uv run --locked manage.py prune_demo --days 7 --dry-run
-uv run --locked manage.py prune_demo --days 7
-uv run --locked manage.py clearsessions
+nova-compose exec web python manage.py prune_demo --days 7 --dry-run
+nova-compose exec web python manage.py prune_demo --days 7
+nova-compose exec web python manage.py clearsessions
 ```
 
 The cleanup only affects DemoWorkspace and related records. The categories of the previous
